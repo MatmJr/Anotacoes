@@ -125,3 +125,69 @@ $ docker-compose down -v
 $ docker image list | grep none | tr -s " " | cut -f 3 -d ' ' | xargs docker image rm -f
 ```
 
+[2. Projeto lógico](https://senacsp.blackboard.com/bbcswebdav/pid-7582902-dt-content-rid-230701953_1/courses/STBDCAS2DA_2103-2103-686276/Template/Rise/Aula_02/content/index.html#/)
+
+Uma das capacidades mais importantes para um desenvolvedor de sistemas    é   a   de   abstração.   Isso   significa   ser   capaz   de    isolar   o   problema   em diferentes níveis de detalhe e  considerar apenas os aspectos envolvidos que importam para a resolução  do problema. O nível mais alto de abstração é conhecido como “espaço do  problema”. Já o nível de abstração mais baixo é o nível físico, que diz  respeito à máquina. No contexto de bancos de dados, o nível físico é  tudo aquilo que o SGBD esconde de seu usuário, inclusive como os dados  são organizados nos arquivos do sistema operacional.
+
+<img src="/home/matmj/Documents/Banco de Dados - Senac/imgs/Screenshot from 2021-10-24 00-24-34.png" style="zoom: 67%;" />
+
+Um **modelo descritivo** é gerado pela “análise de requisitos”, sendo sua principal característica a informalidade. 
+
+Os dois próximos níveis, no contexto dos bancos relacionais, ambos os níveis estão ligados à  abstração de tabela, com linhas e colunas. Contudo, o **nível  computacional** é dependente de detalhes da tecnologia e deve dialogar  diretamente com os recursos e definições providos por um SGBD em particular, como o MySQL. Já   o   **nível conceitual** é mais abstrato. Um mesmo modelo conceitual  para bancos relacionais deve ser igualmente aplicável a qualquer SGBD  relacional, como   o   PostgreSQL   ou   o   SQL   Server,  normalmente o projeto conceitual é expresso por meio de um diagrama entidade-relacionamento (ou “diagrama ER”). Uma entidade também pode possuir atributos, o que equivale às colunas das tabelas, um modelo entidade-relacionamento também modela relacionamentos entre entidades. 
+
+**Para fixar:** Uma   forma   de   definir   uma   tabela   no nível conceitual é  por meio de um diagrama; já no nível computacional, devemos utilizar o  comando CREATE TABLE da SQL.
+
+A representação completa de um modelo de bancos de dados (entidades,  atributos, relacionamentos, etc.) é chamada de esquema. Um esquema  conceitual é representado por um diagrama ER ou um conjunto de diagramas ER. Já   o   esquema   do   modelo   computacional   é   a   definição   precisa   das   tabelas da base de dados, normalmente  feita em linguagem SQL.
+
+Por mais que computadores sejam rápidos, bancos de dados podem ser muito grandes e percorrer milhões de itens pode levar alguns segundos, o que é um tempo   muito   alto   para   que   o   usuário   fique   esperando.   A   solução   para   esse    problema são os índices, que são estruturas que tornam as consultas  mais rápidas. Um   índice   possibilita   a   busca   eficiente   nas   linhas    da   tabela   a   partir   de   um   valor   da   coluna   (SETZER; SILVA, 2005). 
+
+No MySQL, índices podem ser criados com o seguinte comando:
+
+```sql
+CREATE INDEX nome_do_indice ON nome_da_tabela (nome_da_coluna(comprimento_do_texto));
+
+#Note    que    para    criar    um    índice    para    uma    coluna    textual    é    preciso    definir quantos caracteres iniciais do texto o índice considerará.Exemplo:
+
+CREATE INDEX index_nome_cliente ON cliente (nome(10));
+```
+
+A utilização de índices também apresenta desvantagens.  Mesmo para um computador, é mais rápido simplesmente inserir um novo   registro   no   fim   da   tabela   do   que   reorganizar   a    estrutura   de   índice   a   cada inserção de dados. Além disso, a utilização de índices aumenta o tamanho (em bytes) da base de dados (o  índice é uma estrutura à parte que deve ser armazenada).
+
+**Atenção:** a criação de muitos índices pode tornar a inserção de dados lenta. Mas a ausência de índices pode tornar a consulta de dados lenta. 
+
+Exemplo do Vídeo: Após baixar o kit_aluno_aula_02 e executar o terminal de dentro da pasta:
+
+```dockerfile
+#Não esqueça de usar o comando su
+$ docker-compose up
+#Não fechar o prompt atual e abrir um novo
+
+#No novo prompt digite
+$ docker-compose exec db mysql -p
+
+#Exibir todos os bancos que foram carregados do kit aula 02
+> SHOW databases;
+
+#Acessar o database voos_eua_2016
+> USE voos_eua_2016;
+
+#Exibir todas as tables do database
+> SHOW tables;
+
+#Exibir os elementos da table flights
+> SELECT * from flights limit 15;
+
+#Mostrar o tamanho das tabelas
+> SELECT database_name, table_name, index_name,
+ROUND(stat_value * @@innodb_page_size / 1024 / 1024, 2) size_in_mb
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size' AND index_name != 'PRIMARY'
+ORDER BY size_in_mb DESC; 
+
+#Contar os registros da tabela flights
+> select count(*) from flights;
+
+#Contar os registros de uma empresa
+> select count(*) from flights where unique_carrier = 'AA';
+```
+
